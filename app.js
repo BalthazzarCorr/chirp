@@ -70,25 +70,30 @@ $(()=>{
             });
             this.get('#/feed',(ctx)=>{
                 if (auth.isAuth()) {
-
                     ctx.loadPartials({
                         header: './templates/common/header.hbs',
                         footer: './templates/common/footer.hbs',
                         menu: './templates/common/menu.hbs'
                     }).then(function () {
 
-                        let info = service.getStats(sessionStorage.getItem('username')).then(function (value) {
-                            console.log(value)
-                        });
                         service.getChirps().then(data =>{
                             ctx.username = sessionStorage.getItem('username');
                              ctx.chirps = data;
                              data.forEach(p => {
                               p.date = calcTime(p._kmd.ect);
                              });
-                             ctx.chirpsCount = info[0];
-                             ctx.following = info[1];
-                             ctx.followers = info[2];
+                             service.getStats(sessionStorage.getItem('username')).then(stats =>{
+                                 stats =
+                                     {
+                                     chirpsCount: stats[0],
+                                     following: stats[1],
+                                     followers: stats[2]
+                                 };
+                                 ctx.render('./templates/common/stats.hbs', {stats})
+                                     .then(function () {
+                                     this.replace('#userStats');
+                                 });
+                             }).catch(displayNotification.handleError);
 
                             this.partial('./templates/feed.hbs')
                         })

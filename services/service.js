@@ -111,12 +111,7 @@ let service = (() => {
         let following = Number(await service.countFollowing(username));
         let followers = Number(await service.countFollowers(username));
 
-        return{
-            chirps,
-            following,
-            followers
-        }
-
+        return Promise.all([chirps, following, followers]);
     }
 
     async  function follow(targetUser) {
